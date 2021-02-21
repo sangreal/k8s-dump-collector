@@ -1,9 +1,26 @@
-plugins {
-    id 'java'
-}
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'application'
 
-group 'org.example'
-version '1.0-SNAPSHOT'
+mainClassName = 'com.smartnews.dump.Main'
+
+// tag::repositories[]
+repositories {
+    mavenCentral()
+}
+// end::repositories[]
+
+// tag::jar[]
+jar {
+    manifest {
+        attributes(
+                'Class-Path': configurations.compile.collect { it.getName() }.join(' '),
+                'Main-Class': 'com.smartnews.dump.Main'
+        )
+    }
+    archiveBaseName = 'com.smartnews.dump.collector'
+    archiveVersion =  '0.1.0'
+}
 
 repositories {
     mavenCentral()
