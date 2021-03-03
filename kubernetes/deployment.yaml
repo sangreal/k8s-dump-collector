@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sn-dump-collector
+  namespace: sn-push
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sn-dump-collector
+      env: dev
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: sn-dump-collector
+        env: dev
+    spec:
+      containers:
+        - image:  martynwin/sn-oom-jar:0.1
+          imagePullPolicy: Always
+          name: sn-oom-jar
+          lifecycle:
+            preStop:
+              exec:
+                command: ["/bin/sh","-c","sleep 100000"]
+          resources:
+            requests:
+              cpu: "0.5"
+              memory: "512Mi"
+            limits:
+              cpu: "0.5"
+              memory: "512Mi"
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          volumeMounts:
+            - mountPath: /coredumps
+              name: shared-volume
+        - image:  martynwin/sn-dump-collector:0.1
+          name: sn-dump-collector
+          imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: "0.5"
+              memory: "512Mi"
+            limits:
+              cpu: "0.5"
+              memory: "512Mi"
+          env:
+            - name: WATCH_DIR
+              value: /coredumps
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          volumeMounts:
+            - mountPath: /coredumps
+              name: shared-volume
+      volumes:
+        - name: shared-volume
+          emptyDir: {}
