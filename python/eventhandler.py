@@ -6,6 +6,7 @@ import logging
 import S3Utils
 from datetime import datetime
 import os
+import threading
 
 class OnMyWatch:
     # Set the directory on watch
@@ -14,12 +15,15 @@ class OnMyWatch:
         self.observer = Observer()
 
     def run(self):
-        watchDirectory = os.getenv("WATCH_DIR") if os.getenv("WATCH_DIR") is not None else "/coredumps"
+        watch_directory = os.getenv("WATCH_DIR") if os.getenv("WATCH_DIR") is not None else "/coredumps"
+
+        logging.info("before to watch file, dir : " + watch_directory)
+        print("before to watch file, dir : " + watch_directory)
 
         event_handler = Handler()
-        self.observer.schedule(event_handler, watchDirectory, recursive = True)
+        self.observer.schedule(event_handler, watch_directory)
         self.observer.start()
-        print("begin to watch file, dir : " + watchDirectory)
+        logging.info("begin to watch file, dir : " + watch_directory)
         try:
             while True:
                 time.sleep(5)
@@ -28,6 +32,7 @@ class OnMyWatch:
             print("Observer Stopped")
 
         self.observer.join()
+
 
 
 class Handler(FileSystemEventHandler):
