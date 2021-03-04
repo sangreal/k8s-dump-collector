@@ -46,7 +46,7 @@ spec:
           volumeMounts:
             - mountPath: /coredumps
               name: shared-volume
-        - image:  martynwin/sn-dump-collector:0.1.1
+        - image:  martynwin/sn-dump-collector-go:0.1.1
           name: sn-dump-collector
           imagePullPolicy: Always
           resources:

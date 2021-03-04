@@ -30,7 +30,7 @@ func main() {
 }
 
 func getNS() string {
-	os.Getenv("NAMESPACE_NAME")
+	return os.Getenv("NAMESPACE_NAME")
 }
 
 func getPodName() string {
